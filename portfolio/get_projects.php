@@ -1,6 +1,5 @@
 <?php
 header('Content-Type: application/json');
-
 require_once 'config.php';
 
 try {
@@ -8,8 +7,9 @@ try {
     $projects = $stmt->fetchAll();
     
     foreach ($projects as &$project) {
-        $project['technologies'] = explode(',', $project['technologies']);
+        $project['technologies'] = explode(',', $project['technologies'] ?? '');
     }
+    unset($project); // Prevent reference issues
     
     echo json_encode([
         'success' => true,
@@ -17,9 +17,10 @@ try {
     ]);
     
 } catch(PDOException $e) {
+    http_response_code(500);
     echo json_encode([
         'success' => false,
-        'error' => $e->getMessage()
+        'error' => 'Failed to load projects'
     ]);
 }
 ?>
